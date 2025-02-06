@@ -1,0 +1,1 @@
+# X0GameBot-version-0.2
