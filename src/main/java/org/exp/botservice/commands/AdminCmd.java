@@ -1,12 +1,12 @@
 package org.exp.botservice.commands;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.exp.Main;
+import org.exp.botservice.database.DB;
 import org.exp.entity.State;
 import org.exp.entity.TgUser;
-
-import java.util.Objects;
 
 @RequiredArgsConstructor
 public class AdminCmd implements BotCommand {
@@ -15,11 +15,15 @@ public class AdminCmd implements BotCommand {
 
     @Override
     public void process() {
-        if (Objects.equals(tgUser.getChatId(), "6513286717")){
-            SendMessage sendMessage = new SendMessage(tgUser.getChatId(), "You admin!");
-            tgUser.setState(State.ADMIN_CABINET);
-
-            Main.telegramBot.execute(sendMessage);
-        }
+        SendMessage sendMessage = new SendMessage(
+                tgUser.getChatId(),
+                """
+                ADMIN PANEL
+                
+                """ + DB.TG_USERS_LIST.toString()
+        );
+        tgUser.setState(State.ADMIN_CABINET);
+        SendResponse response = Main.telegramBot.execute(sendMessage);
+        tgUser.setMessageId(response.message().messageId());
     }
 }

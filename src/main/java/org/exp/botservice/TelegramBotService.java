@@ -11,6 +11,7 @@ import org.exp.botservice.servicemessages.ResourceMessageManager;
 import org.exp.entity.TgUser;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 import static org.exp.Main.telegramBot;
@@ -46,6 +47,12 @@ public class TelegramBotService {
                     ///Terminal log
                     System.out.println("\n" + tgUser);
                     System.out.println("Update object: " + update);
+
+                } else if (text != null && text.equals("/admin") && Objects.equals(tgUser.getChatId(), "6513286717")) {
+                    command = new AdminCmd(tgUser, update);
+
+                    ///Terminal log
+                    System.out.println("\n" + tgUser);
 
                 } else {
                     telegramBot.execute(new SendMessage(chatId, getString(Constant.WARNING_MSG)));
