@@ -105,8 +105,7 @@ public class PlayGameCmd implements BotCommand {
 
     // Bot uchun eng yaxshi yurishni topish
     private int[] findBestMove(int[][] board) {
-        GameLogic gameLogic = new GameLogic();
-        return gameLogic.findBestMove(board);
+        return new GameLogic().findBestMove(board);
     }
 
     // Yutishni tekshirish
@@ -147,6 +146,7 @@ public class PlayGameCmd implements BotCommand {
     // Natijani yuborish
     private void sendResult(String resultMessage) {
         String boardState = formatBoard(tgUser.getGameBoard());
+
         EditMessageText editMessage = getEditMessageText(resultMessage, boardState);
 
         editMessage.parseMode(ParseMode.valueOf("HTML"));
@@ -177,7 +177,7 @@ public class PlayGameCmd implements BotCommand {
         return new EditMessageText(
                 tgUser.getChatId(),
                 tgUser.getMessageId(),
-                "<b> " + " " + " </b>\n   <b>" //getString(RESULT_MSG)
+                "<b> " + getString(RESULT_MSG) + " </b><b>"
                         + getString(resultMessage)
                         + "</b>\n\n<b>" + getString(BOARD_MSG) + "</b>"
                         + boardState
@@ -225,10 +225,10 @@ public class PlayGameCmd implements BotCommand {
             tgUser.setPlayerSymbol(X_SIGN);
             tgUser.setBotSymbol(O_SIGN);
         } else if (data.equals("CHOOSE_O")) {
-            tgUser.setPlayerSymbol(X_SIGN);
-            tgUser.setBotSymbol(O_SIGN);
+            tgUser.setPlayerSymbol(O_SIGN);
+            tgUser.setBotSymbol(X_SIGN);
         } else {
-            SendMessage sendMessage = new SendMessage(tgUser.getChatId(), "Xato: Belgilanmagan belgi!");
+            SendMessage sendMessage = new SendMessage(tgUser.getChatId(), "Error: Undefined character!");
             sendMessage.replyMarkup(BotButtonService.genCabinetButtons(tgUser));
             SendResponse sendResponse = telegramBot.execute(sendMessage);
             tgUser.setMessageId(sendResponse.message().messageId());

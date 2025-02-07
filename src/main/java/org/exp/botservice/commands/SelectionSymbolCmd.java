@@ -22,11 +22,6 @@ public class SelectionSymbolCmd implements BotCommand {
                 tgUser.getChatId(),
                 tgUser.getMessageId(),
                 ResourceMessageManager.getString(Constant.CHOOSE_SYMBOL_MSG)
-                        /*.formatted(
-                        tgUser.getBoardSize(),
-                        tgUser.getBoardSize(),
-                        tgUser.getDifficultyLevel()
-                        )*/
         );
         editMessageText.replyMarkup(chooseSymbolButtons());
         tgUser.setState(State.SYMBOL_CHOOSING);

@@ -5,13 +5,13 @@ import com.pengrad.telegrambot.request.DeleteMessage;
 import com.pengrad.telegrambot.request.SendMessage;
 
 import org.exp.botservice.commands.*;
-import org.exp.botservice.servicemessages.Constant;
+import org.exp.botservice.commands.admincommands.AdminCmd;
+import org.exp.botservice.commands.admincommands.AdminPanelCmd;
 
 import org.exp.botservice.servicemessages.ResourceMessageManager;
 import org.exp.entity.TgUser;
 
 import java.util.Locale;
-import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 import static org.exp.Main.telegramBot;
@@ -25,38 +25,32 @@ public class TelegramBotService {
             if (update.message() != null) {
                 Long chatId = update.message().chat().id();
                 TgUser tgUser = getOrCreateUser(chatId);
+                tgUser.setUsername(update.message().chat().username());
                 String text = update.message().text();
                 BotCommand command = null;
 
-                System.out.println("Update object: " + update);
+                //System.out.println("Update object: " + update);
 
-                if (text != null && text.equals("/start")) {
-                    tgUser.setLanguage("en"); /// default language 'english'
+                if (text != null){
+                    if (text.equals(START)) {
+                        tgUser.setLanguage(DEF_LANG_EN); /// default language 'english'
+                        ResourceMessageManager.setLocale(new Locale(DEF_LANG_EN));
 
-                    ResourceMessageManager.setLocale(new Locale("en"));
+                        if (tgUser.getMessageId() != null) {
+                            telegramBot.execute(new DeleteMessage(
+                                    tgUser.getChatId(),
+                                    tgUser.getMessageId())
+                            );
+                        }
+                        command = new CabinetCmd(tgUser);
+                    } else {
+                        int newMessageId = telegramBot.execute(
+                                new SendMessage(chatId, getString(WARNING_MSG))
+                        ).message().messageId();
+                        tgUser.setMessageId(newMessageId);
 
-                    command = new CabinetCmd(tgUser);
-                    if (tgUser.getMessageId()!=null){
-                        telegramBot.execute(new DeleteMessage(
-                                tgUser.getChatId(),
-                                tgUser.getMessageId())
-                        );
-                        restoringTgUserList();
+                        command = new CabinetCmd(tgUser);
                     }
-
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
-                    System.out.println("Update object: " + update);
-
-                } else if (text != null && text.equals("/admin") && Objects.equals(tgUser.getChatId(), "6513286717")) {
-                    command = new AdminCmd(tgUser, update);
-
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
-
-                } else {
-                    telegramBot.execute(new SendMessage(chatId, getString(Constant.WARNING_MSG)));
-                    command = new CabinetCmd(tgUser);
                 }
                 requireNonNull(command).process();
             }
@@ -67,41 +61,29 @@ public class TelegramBotService {
                 TgUser tgUser = getOrCreateUser(chatId);
                 String data = update.callbackQuery().data();
 
-                if (data.startsWith("cell_")) {
+                if (data.startsWith(CELL)) {
                     command = new InGame(tgUser, update, data);
 
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
-
-                } else if (data.startsWith("lang_")) {
+                } else if (data.startsWith(LANG)) {
                     command = new LanguageChangerCmd(tgUser, data);
-
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
 
                 } else if (data.equals(PLAY_BTN)) {
                     command = new SelectionSymbolCmd(tgUser, update);
 
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
+                } else if (data.startsWith(CHOSEN_SYMBOL)) {
+                    command = new PlayGameCmd(tgUser, update, data);
 
                 } else if (data.equals(LANGUAGE_MSG)) {
                     command = new LanguageCmd(tgUser);
 
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
-
-                } else if (data.startsWith("CHOOSE_")) {
-                    command = new PlayGameCmd(tgUser, update, data);
-
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
-
-                } else if (data.startsWith("back")) {
+                } else if (data.startsWith(BACK)) {
                     command = new BackButtonCmd(tgUser, update, data);
 
-                    ///Terminal log
-                    System.out.println("\n" + tgUser);
+                } else if (data.equals(ADMIN)) {
+                    command = new AdminCmd(tgUser);
+
+                } else if (data.startsWith(ADMIN_CALLBACK)) {
+                    command = new AdminPanelCmd(tgUser, update, data);
                 }
                 requireNonNull(command).process();
             }

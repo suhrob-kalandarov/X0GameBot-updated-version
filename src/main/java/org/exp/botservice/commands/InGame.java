@@ -14,7 +14,6 @@ public class InGame implements BotCommand {
     public void process() {
         int row = Integer.parseInt(data.split("_")[1]);
         int col = Integer.parseInt(data.split("_")[2]);
-        PlayGameCmd playGameCmd = new PlayGameCmd(tgUser, update, data);
-        playGameCmd.handleMove(row, col);
+        new PlayGameCmd(tgUser, update, data).handleMove(row, col);
     }
 }

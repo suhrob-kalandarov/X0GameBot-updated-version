@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 public class TgUser {
     private Long chatId;
+    private String username;
     private Integer messageId;
     private State state;
 

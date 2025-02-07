@@ -11,7 +11,7 @@ import static org.exp.botservice.servicemessages.ResourceMessageManager.getStrin
 public interface BotButtonService {
 
     static InlineKeyboardMarkup genCabinetButtons(TgUser tgUser) {
-        return new InlineKeyboardMarkup()
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup()
                 .addRow(
                         new InlineKeyboardButton(getString(PLAY_BTN))
                                 .callbackData(PLAY_BTN)
@@ -20,6 +20,10 @@ public interface BotButtonService {
                         new InlineKeyboardButton(getString(LANGUAGE_MSG))
                                 .callbackData(LANGUAGE_MSG)
                 );
+        if (tgUser.getChatId().equals(adminChatId)) {
+            inlineKeyboardMarkup.addRow(new InlineKeyboardButton("ADMIN PANEL").callbackData("admin"));
+        }
+        return inlineKeyboardMarkup;
     }
 
     static InlineKeyboardMarkup genGameBoard(int[][] board, String playerSymbol) {
@@ -62,4 +66,29 @@ public interface BotButtonService {
                         new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("back_to_cabinet")
                 );
     }
+
+    static InlineKeyboardMarkup genAdminBtns() {
+        return new InlineKeyboardMarkup()
+                .addRow(new InlineKeyboardButton(SEND_MSG_TO_BOT_USERS_BTN).callbackData("admin_send_message"))
+                .addRow(new InlineKeyboardButton(GET_USERS_LIST_BTN).callbackData("admin_get_users_list"))
+                .addRow(new InlineKeyboardButton(DATA_STORAGE_BTN).callbackData("admin_data_storage"))
+                .addRow(new InlineKeyboardButton(UPDATE_USERS_DATA_BTN).callbackData("admin_update_users_data"))
+                .addRow(new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("back_to_cabinet"));
+    }
+
+    static InlineKeyboardMarkup genMessageStylesBtns() {
+        return new InlineKeyboardMarkup()
+                .addRow(
+                        new InlineKeyboardButton(SEND_MSG_WITH_PIC).callbackData(SEND_MSG_WITH_PIC),
+                        new InlineKeyboardButton(SEND_MSG_WITH_VID).callbackData(SEND_MSG_WITH_VID)
+                )
+                .addRow(
+                        new InlineKeyboardButton(SEND_MSG_WITH_TXT).callbackData(SEND_MSG_WITH_TXT),
+                        new InlineKeyboardButton("null?").callbackData("null?")
+                )
+                /*.addRow(
+                        new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("admin_back_to_cabinet")
+                )*/;
+    }
 }
+
