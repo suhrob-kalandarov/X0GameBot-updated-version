@@ -1,7 +1,6 @@
 package org.exp.botservice.service;
 
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.*;
 
 import org.exp.entity.TgUser;
 
@@ -20,9 +19,9 @@ public interface BotButtonService {
                         new InlineKeyboardButton(getString(LANGUAGE_MSG))
                                 .callbackData(LANGUAGE_MSG)
                 );
-        if (tgUser.getChatId().equals(adminChatId)) {
+        /*if (tgUser.getChatId().equals(adminChatId)) {
             inlineKeyboardMarkup.addRow(new InlineKeyboardButton("ADMIN PANEL").callbackData("admin"));
-        }
+        }*/
         return inlineKeyboardMarkup;
     }
 
@@ -69,26 +68,30 @@ public interface BotButtonService {
 
     static InlineKeyboardMarkup genAdminBtns() {
         return new InlineKeyboardMarkup()
-                .addRow(new InlineKeyboardButton(SEND_MSG_TO_BOT_USERS_BTN).callbackData("admin_send_message"))
+                .addRow(new InlineKeyboardButton(SEND_MSG_TO_BOT_USERS_BTN).callbackData("admin_send_message_to_users"))
+                .addRow(new InlineKeyboardButton(SEND_MSG_TO_BOT_USER_BTN).callbackData("admin_send_message_to_user"))
                 .addRow(new InlineKeyboardButton(GET_USERS_LIST_BTN).callbackData("admin_get_users_list"))
-                .addRow(new InlineKeyboardButton(DATA_STORAGE_BTN).callbackData("admin_data_storage"))
-                .addRow(new InlineKeyboardButton(UPDATE_USERS_DATA_BTN).callbackData("admin_update_users_data"))
-                .addRow(new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("back_to_cabinet"));
+                .addRow(new InlineKeyboardButton("View Existing Photo Files").callbackData("admin_view_photo_files"))
+                .addRow(new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("admin_back_to_game_cabinet"));
     }
 
     static InlineKeyboardMarkup genMessageStylesBtns() {
         return new InlineKeyboardMarkup()
                 .addRow(
-                        new InlineKeyboardButton(SEND_MSG_WITH_PIC).callbackData(SEND_MSG_WITH_PIC),
-                        new InlineKeyboardButton(SEND_MSG_WITH_VID).callbackData(SEND_MSG_WITH_VID)
+                        new InlineKeyboardButton(SEND_MSG_WITH_PIC).callbackData("msg_with_pic"),
+                        new InlineKeyboardButton(SEND_MSG_WITH_TXT).callbackData("msg_with_text")
                 )
                 .addRow(
-                        new InlineKeyboardButton(SEND_MSG_WITH_TXT).callbackData(SEND_MSG_WITH_TXT),
-                        new InlineKeyboardButton("null?").callbackData("null?")
-                )
-                /*.addRow(
                         new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("admin_back_to_cabinet")
-                )*/;
+                );
+    }
+
+    static Keyboard genAdminBtn() {
+        return new ReplyKeyboardMarkup((new KeyboardButton(ADMIN))).resizeKeyboard(true).oneTimeKeyboard(true);
+    }
+
+    static InlineKeyboardMarkup genBackButton() {
+        return new InlineKeyboardMarkup(new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("admin_back_to_cabinet"));
     }
 }
 

@@ -1,18 +1,15 @@
 package org.exp.botservice.commands.admincommands;
 
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.EditMessageText;
-import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
-import org.exp.Main;
+
+import org.exp.botservice.commands.BackButtonCmd;
 import org.exp.botservice.commands.BotCommand;
 import org.exp.botservice.commands.admincommands.msgcmds.MsgFormatsCmd;
-import org.exp.botservice.service.BotButtonService;
+import org.exp.botservice.commands.admincommands.msgcmds.SendingMsgToOneUser;
 import org.exp.entity.TgUser;
 
 import java.util.Objects;
-
-import static org.exp.botservice.servicemessages.Constant.*;
 
 @RequiredArgsConstructor
 public class AdminPanelCmd implements BotCommand {
@@ -22,20 +19,14 @@ public class AdminPanelCmd implements BotCommand {
 
     @Override
     public void process() {
-        BotCommand command = null;
-
-        if (data.equals(SEND_MSG_TO_BOT_USERS_BTN)) {
-            command = new MsgFormatsCmd(tgUser);
-
-        } else if (data.equals(GET_USERS_LIST_BTN)) {
-
-        } else if (data.equals(DATA_STORAGE_BTN)) {
-
-        } else if (data.equals(UPDATE_USERS_DATA_BTN)) {
-
-        } else {
-            command = new AdminCmd(tgUser);
-        }
+        BotCommand command = switch (data) {
+            case "admin_send_message_to_users" -> new MsgFormatsCmd(tgUser);
+            case "admin_send_message_to_user" -> new SendingMsgToOneUser(tgUser);
+            case "admin_get_users_list" -> new DataStorageCmd(tgUser);
+            case "admin_view_photo_files" -> new ViewPhotoFilesCmd(tgUser, update);
+            //case "admin_back_to_game_cabinet" -> new BackButtonCmd(tgUser, update, data);
+            default -> new BackButtonCmd(tgUser, update, data);
+        };
         Objects.requireNonNull(command).process();
     }
 }

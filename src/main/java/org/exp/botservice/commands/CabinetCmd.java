@@ -11,6 +11,7 @@ import org.exp.entity.State;
 import org.exp.entity.TgUser;
 
 import static org.exp.Main.telegramBot;
+import static org.exp.botservice.database.DB.isAdmin;
 
 @RequiredArgsConstructor
 public class CabinetCmd implements BotCommand{
@@ -18,6 +19,16 @@ public class CabinetCmd implements BotCommand{
 
     @Override
     public void process() {
+        if (isAdmin(tgUser)) {
+            SendMessage message = new SendMessage(
+                    tgUser.getChatId(),
+                    "You're admin! I added admin button!"
+            );
+            message.replyMarkup(BotButtonService.genAdminBtn());
+            SendResponse response = telegramBot.execute(message);
+            tgUser.setMessageId(response.message().messageId());
+        }
+
         SendMessage sendMessage = new SendMessage(
                 tgUser.getChatId(),
                 ResourceMessageManager.getString(Constant.START_MSG)

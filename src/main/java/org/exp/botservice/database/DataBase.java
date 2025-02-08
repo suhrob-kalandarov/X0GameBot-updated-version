@@ -14,6 +14,4 @@ public interface DataBase {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 
-
-
 }

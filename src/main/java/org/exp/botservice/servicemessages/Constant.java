@@ -3,7 +3,6 @@ package org.exp.botservice.servicemessages;
 public interface Constant {
 
     // Xabar kalitlari
-    Long adminChatId = 6513286717L;
     String EMPTY_SIGN = "⬜";
     String X_SIGN = "❌";
     String O_SIGN = "⭕";
@@ -34,17 +33,18 @@ public interface Constant {
 
     // Admin message keys
     String SEND_MSG_TO_BOT_USERS_BTN = "Send message to users";
+    String SEND_MSG_TO_BOT_USER_BTN = "Send message to user";
     String GET_USERS_LIST_BTN = "Get users list";
     String DATA_STORAGE_BTN = "Save data";
     String UPDATE_USERS_DATA_BTN = "Updating user information in the database";
 
     // cmd keys
     String START = "/start";
+    String ADMIN = "ADMIN";
     String CELL = "cell_";
     String BACK = "back";
     String LANG = "lang_";
     String DEF_LANG_EN = "en";
-    String ADMIN = "admin";
     String ADMIN_CALLBACK = "admin_";
     String CHOSEN_SYMBOL = "CHOOSE_";
 
