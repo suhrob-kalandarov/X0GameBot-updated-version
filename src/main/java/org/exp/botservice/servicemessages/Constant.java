@@ -32,6 +32,7 @@ public interface Constant {
 
 
     // Admin message keys
+    String SEND_MSG_BTN = "Send message";
     String SEND_MSG_TO_BOT_USERS_BTN = "Send message to users";
     String SEND_MSG_TO_BOT_USER_BTN = "Send message to user";
     String GET_USERS_LIST_BTN = "Get users list";
@@ -40,7 +41,8 @@ public interface Constant {
 
     // cmd keys
     String START = "/start";
-    String ADMIN = "ADMIN";
+    String ADMIN = "ADMIN MENU";
+    String GAME = "GAME MENU";
     String CELL = "cell_";
     String BACK = "back";
     String LANG = "lang_";

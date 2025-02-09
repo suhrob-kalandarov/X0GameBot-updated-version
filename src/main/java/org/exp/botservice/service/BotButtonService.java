@@ -1,16 +1,18 @@
 package org.exp.botservice.service;
 
 import com.pengrad.telegrambot.model.request.*;
+import org.exp.entity.adminentities.Admin;
 
-import org.exp.entity.TgUser;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.exp.botservice.servicemessages.Constant.*;
 import static org.exp.botservice.servicemessages.ResourceMessageManager.getString;
 
 public interface BotButtonService {
 
-    static InlineKeyboardMarkup genCabinetButtons(TgUser tgUser) {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup()
+    static InlineKeyboardMarkup genCabinetButtons() {
+        return new InlineKeyboardMarkup()
                 .addRow(
                         new InlineKeyboardButton(getString(PLAY_BTN))
                                 .callbackData(PLAY_BTN)
@@ -19,10 +21,6 @@ public interface BotButtonService {
                         new InlineKeyboardButton(getString(LANGUAGE_MSG))
                                 .callbackData(LANGUAGE_MSG)
                 );
-        /*if (tgUser.getChatId().equals(adminChatId)) {
-            inlineKeyboardMarkup.addRow(new InlineKeyboardButton("ADMIN PANEL").callbackData("admin"));
-        }*/
-        return inlineKeyboardMarkup;
     }
 
     static InlineKeyboardMarkup genGameBoard(int[][] board, String playerSymbol) {
@@ -66,32 +64,95 @@ public interface BotButtonService {
                 );
     }
 
+
+    /// ADMIN BUTTONS
     static InlineKeyboardMarkup genAdminBtns() {
         return new InlineKeyboardMarkup()
-                .addRow(new InlineKeyboardButton(SEND_MSG_TO_BOT_USERS_BTN).callbackData("admin_send_message_to_users"))
-                .addRow(new InlineKeyboardButton(SEND_MSG_TO_BOT_USER_BTN).callbackData("admin_send_message_to_user"))
-                .addRow(new InlineKeyboardButton(GET_USERS_LIST_BTN).callbackData("admin_get_users_list"))
-                .addRow(new InlineKeyboardButton("View Existing Photo Files").callbackData("admin_view_photo_files"))
-                .addRow(new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("admin_back_to_game_cabinet"));
+                .addRow(new InlineKeyboardButton(SEND_MSG_BTN).callbackData("admin_want_to_send_message"))
+                .addRow(new InlineKeyboardButton(GET_USERS_LIST_BTN).callbackData("admin_want_to_get_users_list"))
+                .addRow(new InlineKeyboardButton("View Existing Photo Files").callbackData("admin_want_to_view_photo_files"))
+                .addRow(new InlineKeyboardButton("Back↩️").callbackData("admin_want_to_back_to_game_cabinet"));
     }
 
     static InlineKeyboardMarkup genMessageStylesBtns() {
         return new InlineKeyboardMarkup()
                 .addRow(
                         new InlineKeyboardButton(SEND_MSG_WITH_PIC).callbackData("msg_with_pic"),
-                        new InlineKeyboardButton(SEND_MSG_WITH_TXT).callbackData("msg_with_text")
+                        new InlineKeyboardButton(SEND_MSG_WITH_TXT).callbackData("msg_only_text")
                 )
                 .addRow(
-                        new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("admin_back_to_cabinet")
+                        new InlineKeyboardButton("Back↩️").callbackData("admin_want_to_send_message")
                 );
     }
 
-    static Keyboard genAdminBtn() {
+    static InlineKeyboardMarkup getMessageMainPanelOptions() {
+        return new InlineKeyboardMarkup()
+                .addRow(
+                        new InlineKeyboardButton(SEND_MSG_TO_BOT_USER_BTN).callbackData("admin_send_message_to_an_user"),
+                        new InlineKeyboardButton(SEND_MSG_TO_BOT_USERS_BTN).callbackData("admin_send_message_to_users")
+                )
+                .addRow(new InlineKeyboardButton("Back↩️").callbackData("admin_back_to_cabinet"));
+    }
+
+    static Keyboard genAdminMenuBtn() {
         return new ReplyKeyboardMarkup((new KeyboardButton(ADMIN))).resizeKeyboard(true).oneTimeKeyboard(true);
     }
 
-    static InlineKeyboardMarkup genBackButton() {
-        return new InlineKeyboardMarkup(new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("admin_back_to_cabinet"));
+    static Keyboard genGameMenuBtn() {
+        return new ReplyKeyboardMarkup((new KeyboardButton(GAME))).resizeKeyboard(true).oneTimeKeyboard(true);
+    }
+
+    static InlineKeyboardMarkup genBackButton(String callBackData) {
+        return new InlineKeyboardMarkup(new InlineKeyboardButton("Back↩️").callbackData(callBackData));
+    }
+
+    /*
+    static Keyboard fetchUserList(Admin admin) {
+        return new InlineKeyboardMarkup(
+                new InlineKeyboardButton("Show user list").callbackData("admin_want_to_show_user_list"),
+                new InlineKeyboardButton("Back↩️").callbackData("admin_back_to_msg_panel")
+        );
+    }
+    */
+
+    static InlineKeyboardMarkup SendingMsgToOneUserMainOptionBtns() {
+        return new InlineKeyboardMarkup()
+                .addRow(
+                        new InlineKeyboardButton("Show user list").callbackData("admin_want_to_show_user_list")
+                )
+                .addRow(new InlineKeyboardButton("Back↩️").callbackData("admin_want_to_send_message") //admin_back_to_msg_panel
+                );
+    }
+
+
+    static InlineKeyboardMarkup generateImgNameBtns(List<String> photoFiles) {
+        if (photoFiles == null || photoFiles.isEmpty()) {
+            return new InlineKeyboardMarkup(
+                    new InlineKeyboardButton("❌ No files found").callbackData("no_files")
+            );
+        }
+
+        List<InlineKeyboardButton> buttons = new ArrayList<>();
+        for (String fileName : photoFiles) {
+            if (fileName.matches("^[a-f0-9\\-]+\\.\\w+$")) { // UUID shaklidagi fayllarni ajratish
+                String buttonText = fileName.split("-")[0]; // Birinchi `-` gacha bo‘lgan qismini olish
+                buttons.add(new InlineKeyboardButton("🖼 " + buttonText).callbackData("img_" + fileName));
+            }
+        }
+
+        int size = buttons.size();
+        List<InlineKeyboardButton[]> keyboardRows = new ArrayList<>();
+
+        for (int i = 0; i < size - 1; i += 2) {
+            keyboardRows.add(new InlineKeyboardButton[]{buttons.get(i), buttons.get(i + 1)});
+        }
+
+        if (size % 2 != 0) {
+            keyboardRows.add(new InlineKeyboardButton[]{buttons.get(size - 1)});
+        }
+
+        return new InlineKeyboardMarkup(keyboardRows.toArray(new InlineKeyboardButton[0][]))
+                .addRow(new InlineKeyboardButton("Back↩️").callbackData("admin_back_to_cabinet"));
     }
 }
 

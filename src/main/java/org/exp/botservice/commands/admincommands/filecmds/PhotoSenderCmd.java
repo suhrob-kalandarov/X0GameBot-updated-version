@@ -1,4 +1,4 @@
-package org.exp.botservice;
+package org.exp.botservice.commands.admincommands.filecmds;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.exp.Main;
 import org.exp.botservice.commands.BotCommand;
-import org.exp.botservice.database.DB;
-import org.exp.entity.Admin;
+import org.exp.database.DB;
+import org.exp.entity.adminentities.Admin;
 
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
-import org.exp.entity.TgUser;
+import org.exp.entity.tguserentities.TgUser;
 
 import java.io.File;
 

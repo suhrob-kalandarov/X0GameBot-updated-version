@@ -3,33 +3,28 @@ package org.exp.botservice;
 import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.DeleteMessage;
-import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
 
-import com.pengrad.telegrambot.response.GetFileResponse;
-import org.exp.Main;
-import org.exp.botservice.commands.*;
+import org.exp.botservice.commands.BotCommand;
 import org.exp.botservice.commands.admincommands.AdminCmd;
-import org.exp.botservice.commands.admincommands.AdminPanelCmd;
+import org.exp.botservice.commands.admincommands.filecmds.DownloadPhotoCmd;
+import org.exp.botservice.commands.admincommands.filecmds.GetFileCaption;
+import org.exp.botservice.commands.admincommands.filecmds.PhotoSenderCmd;
+import org.exp.botservice.commands.admincommands.maincmds.AdminPanelCmd;
+import org.exp.botservice.commands.admincommands.msgcmds.*;
 
-import org.exp.botservice.commands.admincommands.msgcmds.MsgSenderMainPanel;
-import org.exp.botservice.database.DB;
-import org.exp.botservice.servicemessages.ResourceMessageManager;
-import org.exp.entity.Admin;
-import org.exp.entity.TgUser;
+import org.exp.botservice.commands.botcommands.*;
+import org.exp.entity.adminentities.Admin;
+import org.exp.entity.adminentities.AdminState;
+import org.exp.entity.tguserentities.TgUser;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
 import static org.exp.Main.telegramBot;
-import static org.exp.botservice.database.DB.*;
 import static org.exp.botservice.servicemessages.Constant.*;
 import static org.exp.botservice.servicemessages.ResourceMessageManager.*;
+import static org.exp.database.DB.*;
 
 public class TelegramBotService {
     public static void handleUpdate(Update update) {
@@ -39,11 +34,10 @@ public class TelegramBotService {
                 TgUser tgUser = getOrCreateUser(chatId);
                 tgUser.setUsername(update.message().chat().username());
                 Admin admin = getAdmin(6513286717L);
+                admin.setUsername(update.message().chat().username());
                 String text = update.message().text();
                 PhotoSize[] photo = update.message().photo();
                 BotCommand command = null;
-
-                System.out.println("Update object: " + update);
 
                 if (text != null){
                     if (text.equals(START)) {
@@ -58,33 +52,53 @@ public class TelegramBotService {
                         }
                         command = new CabinetCmd(tgUser);
 
-                    } else if (text.equals(ADMIN) && isAdmin(tgUser)) {
+                    } else if (
+                            text.equals(ADMIN)
+                                    && isAdmin(tgUser)
+                    ){
                         telegramBot.execute(new DeleteMessage(
                                 tgUser.getChatId(),
                                 tgUser.getMessageId())
                         );
-                        command = new AdminCmd(tgUser);
+                        command = new AdminCmd(admin);
 
-                    } else if (text.startsWith("photo_")) {
+                    } else if (
+                            text.startsWith("photo_")
+                                    && admin.getAdminState().equals(AdminState.GET_PHOTO_NAME)
+                    ){
                         command = new GetFileCaption(admin, update);
 
-                    } else if (text.startsWith("caption_")) {
+                    } else if (
+                            text.startsWith("caption_")
+                                    && admin.getAdminState().equals(AdminState.GET_PHOTO_CAPTION)
+                    ){
                         command = new PhotoSenderCmd(admin, update);
 
-                    } else {
-                        telegramBot.execute(new DeleteMessage(
-                                tgUser.getChatId(),
-                                tgUser.getMessageId())
-                        );
-                        int newMessageId = telegramBot.execute(
-                                new SendMessage(chatId, getString(WARNING_MSG))
-                        ).message().messageId();
-                        tgUser.setMessageId(newMessageId);
+                    } else if (text.startsWith("chatId_")) {
+                        command = new CheckTgUserAvailabilityAndRedirect(admin, text);
 
+                    } else {
+                        new WarningHandlerCmd(tgUser).process();
                         command = new CabinetCmd(tgUser);
                     }
-                } else if (photo != null && isAdmin(tgUser)) {
+
+                } else if (
+                        photo != null && isAdmin(tgUser)
+                                && admin.getAdminState().equals(AdminState.RECEIVING_PHOTO)
+                ){
                     command = new DownloadPhotoCmd(tgUser, update);
+
+                } else {
+                    telegramBot.execute(new DeleteMessage(
+                            tgUser.getChatId(),
+                            tgUser.getMessageId())
+                    );
+                    int newMessageId = telegramBot.execute(
+                            new SendMessage(chatId, getString(WARNING_MSG))
+                    ).message().messageId();
+                    tgUser.setMessageId(newMessageId);
+
+                    command = new CabinetCmd(tgUser);
                 }
                 requireNonNull(command).process();
             }
@@ -93,6 +107,7 @@ public class TelegramBotService {
                 BotCommand command = null;
                 Long chatId = update.callbackQuery().from().id();
                 TgUser tgUser = getOrCreateUser(chatId);
+                Admin admin = getAdmin(6513286717L);
                 String data = update.callbackQuery().data();
 
                 if (data.startsWith(CELL)) {
@@ -111,13 +126,14 @@ public class TelegramBotService {
                     command = new LanguageCmd(tgUser);
 
                 } else if (data.startsWith(BACK)) {
-                    command = new BackButtonCmd(tgUser, update, data);
+                    command = new BackButtonCmd(tgUser, data);
 
                 } else if (data.startsWith(ADMIN_CALLBACK)) {
-                    command = new AdminPanelCmd(tgUser, update, data);
+                    command = new AdminPanelCmd(tgUser, admin, update, data);
 
                 } else if (data.startsWith("msg_with_")) {
-                    command = new MsgSenderMainPanel(tgUser, data);
+                    command = new MsgSenderMainPanel(admin, data);
+
                 }
                 requireNonNull(command).process();
             }

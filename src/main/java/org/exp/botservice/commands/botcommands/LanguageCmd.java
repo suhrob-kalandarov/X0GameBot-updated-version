@@ -1,13 +1,14 @@
-package org.exp.botservice.commands;
+package org.exp.botservice.commands.botcommands;
 
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.exp.Main;
+import org.exp.botservice.commands.BotCommand;
 import org.exp.botservice.service.BotButtonService;
-import org.exp.entity.State;
-import org.exp.entity.TgUser;
+import org.exp.entity.tguserentities.State;
+import org.exp.entity.tguserentities.TgUser;
 
 import static org.exp.botservice.servicemessages.Constant.CHOOSE_LANG;
 import static org.exp.botservice.servicemessages.ResourceMessageManager.getString;

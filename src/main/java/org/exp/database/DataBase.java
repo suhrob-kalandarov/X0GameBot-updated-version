@@ -1,4 +1,4 @@
-package org.exp.botservice.database;
+package org.exp.database;
 
 import com.google.gson.Gson;
 import java.sql.*;

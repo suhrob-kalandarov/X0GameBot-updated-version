@@ -1,4 +1,4 @@
-package org.exp.botservice;
+package org.exp.botservice.commands.admincommands.filecmds;
 
 import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.PhotoSize;
@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.exp.Main;
 import org.exp.botservice.commands.BotCommand;
-import org.exp.entity.TgUser;
+import org.exp.entity.tguserentities.TgUser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

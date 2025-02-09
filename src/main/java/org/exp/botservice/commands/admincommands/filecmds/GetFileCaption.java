@@ -1,4 +1,4 @@
-package org.exp.botservice;
+package org.exp.botservice.commands.admincommands.filecmds;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.exp.Main;
 import org.exp.botservice.commands.BotCommand;
-import org.exp.entity.Admin;
+import org.exp.entity.adminentities.Admin;
 
 @RequiredArgsConstructor
 public class GetFileCaption implements BotCommand {

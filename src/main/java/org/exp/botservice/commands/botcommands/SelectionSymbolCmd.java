@@ -1,11 +1,12 @@
-package org.exp.botservice.commands;
+package org.exp.botservice.commands.botcommands;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.response.SendResponse;
+import org.exp.botservice.commands.BotCommand;
 import org.exp.botservice.servicemessages.Constant;
 import org.exp.botservice.servicemessages.ResourceMessageManager;
-import org.exp.entity.State;
-import org.exp.entity.TgUser;
+import org.exp.entity.tguserentities.State;
+import org.exp.entity.tguserentities.TgUser;
 
 import static org.exp.Main.telegramBot;
 import static org.exp.botservice.service.BotButtonService.chooseSymbolButtons;

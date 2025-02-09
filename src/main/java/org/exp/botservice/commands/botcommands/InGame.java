@@ -1,8 +1,9 @@
-package org.exp.botservice.commands;
+package org.exp.botservice.commands.botcommands;
 
 import com.pengrad.telegrambot.model.Update;
 import lombok.RequiredArgsConstructor;
-import org.exp.entity.TgUser;
+import org.exp.botservice.commands.BotCommand;
+import org.exp.entity.tguserentities.TgUser;
 
 @RequiredArgsConstructor
 public class InGame implements BotCommand {

@@ -1,4 +1,4 @@
-package org.exp.botservice.commands;
+package org.exp.botservice.commands.botcommands;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -7,11 +7,12 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 
 import org.exp.Main;
+import org.exp.botservice.commands.BotCommand;
 import org.exp.botservice.gamelogic.GameLogic;
 import org.exp.botservice.service.BotButtonService;
 import org.exp.botservice.servicemessages.Constant;
-import org.exp.entity.State;
-import org.exp.entity.TgUser;
+import org.exp.entity.tguserentities.State;
+import org.exp.entity.tguserentities.TgUser;
 
 import static org.exp.Main.telegramBot;
 import static org.exp.botservice.servicemessages.Constant.*;
@@ -80,6 +81,7 @@ public class PlayGameCmd implements BotCommand {
         if (checkWin(tgUser.getGameBoard(), 2)) {
             tgUser.setBotScore(tgUser.getBotScore()+1);
             sendResult(YOU_LOST_MSG);
+
             return;
         }
 
@@ -157,7 +159,7 @@ public class PlayGameCmd implements BotCommand {
                 tgUser.getChatId(),
                 getString(Constant.START_MSG)
         );
-        sendMainMessage.replyMarkup(BotButtonService.genCabinetButtons(tgUser));
+        sendMainMessage.replyMarkup(BotButtonService.genCabinetButtons());
         SendResponse sendResponse = telegramBot.execute(sendMainMessage);
         tgUser.setMessageId(sendResponse.message().messageId());
         tgUser.setState(State.CABINET);
@@ -229,7 +231,7 @@ public class PlayGameCmd implements BotCommand {
             tgUser.setBotSymbol(X_SIGN);
         } else {
             SendMessage sendMessage = new SendMessage(tgUser.getChatId(), "Error: Undefined character!");
-            sendMessage.replyMarkup(BotButtonService.genCabinetButtons(tgUser));
+            sendMessage.replyMarkup(BotButtonService.genCabinetButtons());
             SendResponse sendResponse = telegramBot.execute(sendMessage);
             tgUser.setMessageId(sendResponse.message().messageId());
         }

@@ -1,13 +1,14 @@
-package org.exp.botservice.commands;
+package org.exp.botservice.commands.botcommands;
 
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.exp.Main;
+import org.exp.botservice.commands.BotCommand;
 import org.exp.botservice.service.BotButtonService;
-import org.exp.entity.State;
-import org.exp.entity.TgUser;
+import org.exp.entity.tguserentities.State;
+import org.exp.entity.tguserentities.TgUser;
 
 import java.util.Locale;
 
@@ -32,7 +33,7 @@ public class LanguageChangerCmd implements BotCommand {
                 tgUser.getMessageId(),
                 getString(LANG_SUCCESS_MSG) + getString(START_MSG)
         );
-        editMessageText.replyMarkup(BotButtonService.genCabinetButtons(tgUser));
+        editMessageText.replyMarkup(BotButtonService.genCabinetButtons());
         SendResponse sendResponse = (SendResponse) Main.telegramBot.execute(editMessageText);
         tgUser.setMessageId(sendResponse.message().messageId());
         tgUser.setState(State.CABINET);

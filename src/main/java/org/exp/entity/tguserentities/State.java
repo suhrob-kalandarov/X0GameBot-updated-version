@@ -1,4 +1,4 @@
-package org.exp.entity;
+package org.exp.entity.tguserentities;
 
 public enum State {
     START,

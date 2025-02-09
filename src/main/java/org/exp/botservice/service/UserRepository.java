@@ -2,7 +2,7 @@ package org.exp.botservice.service;
 
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
-import org.exp.entity.TgUser;
+import org.exp.entity.tguserentities.TgUser;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class UserRepository {
 
     @SneakyThrows
     public static void exportToJson() {
-        String filePath = "org/exp/botservice/database/TgUsers.json";
+        String filePath = "org/exp/database/TgUsers.json";
         String sql = "SELECT * FROM tg_user";
         List<Map<String, Object>> result = new ArrayList<>();
 
