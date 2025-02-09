@@ -1,1 +1,1 @@
-# X0GameBot-version-0.2
+# X0GameBot-updated-version
