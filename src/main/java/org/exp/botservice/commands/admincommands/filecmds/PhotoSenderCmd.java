@@ -22,6 +22,7 @@ public class PhotoSenderCmd implements BotCommand {
 
     @Override
     public void process() {
+
         admin.setPhotoCaption(update.message().text().substring("caption_".length()));
         sendPhotoToAllUsers(update, admin);
     }

@@ -1,72 +1,82 @@
 package org.exp.botservice.commands.admincommands.filecmds;
 
-import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.DeleteMessage;
 import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+
 import org.exp.Main;
 import org.exp.botservice.commands.BotCommand;
-import org.exp.entity.tguserentities.TgUser;
+import org.exp.botservice.commands.admincommands.AdminCmd;
+import org.exp.entity.adminentities.Admin;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
+import static org.exp.Main.telegramBot;
+
 @RequiredArgsConstructor
 public class DownloadPhotoCmd implements BotCommand {
-    private final TgUser tgUser;
+    private final Admin admin;
     private final Update update;
 
     @Override
     public void process() {
-        getPhoto(update);
+        // 1. Faylni yuklab olish
+        PhotoSize[] photos = update.message().photo();
+        GetFileResponse getFileResponse = Main.telegramBot.execute(
+                new GetFile(photos[photos.length - 1].fileId())
+        );
+
+        if (getFileResponse == null || !getFileResponse.isOk()) {
+            Main.telegramBot.execute(
+                    new SendMessage(admin.getChatId(), "File ma'lumotlarini olishda xatolik!")
+            );
+            telegramBot.execute(new DeleteMessage(
+                    admin.getChatId(),
+                    admin.getMessageId())
+            );
+            new AdminCmd(admin).process();
+
+        } else {
+            getPhoto(admin, getFileResponse);
+        }
     }
 
     @SneakyThrows
-    static void getPhoto(Update update) {
-        // 1. Rasm mavjudligini tekshirish
-        if (update.message().photo() == null || update.message().photo().length == 0) {
-            throw new IllegalArgumentException("Xabarda rasm mavjud emas");
-        }
-
-        // 2. Eng yuqori sifatli rasmni tanlash (oxirgi element)
-        PhotoSize[] photos = update.message().photo();
-        PhotoSize largestPhoto = photos[photos.length - 1];
-
-        // 3. File obyektini olish
-        GetFile getFileRequest = new GetFile(largestPhoto.fileId());
-        GetFileResponse getFileResponse = Main.telegramBot.execute(getFileRequest);
-
-        if (getFileResponse == null || !getFileResponse.isOk()) {
-            throw new RuntimeException("File ma'lumotlarini olishda xatolik");
-        }
-
-        File file = getFileResponse.file();
-
-        // 4. Rasm kontentini yuklab olish
-        byte[] fileContent = Main.telegramBot.getFileContent(file);
-
-        // 5. Papka mavjudligini tekshirish va yaratish
+    static void getPhoto(Admin admin, GetFileResponse getFileResponse) {
+        // 2. Papka mavjudligini tekshirish va yaratish
         Path dirPath = Path.of("src/main/java/org/files");
         if (!Files.exists(dirPath)) {
             Files.createDirectories(dirPath);
         }
 
-        // 6. Fayl nomini yaratish va saqlash
+        // 3. Fayl nomini yaratish va saqlash
         String fileName = UUID.randomUUID() + ".jpg";
         Path filePath = dirPath.resolve(fileName);
 
-        Files.write(filePath, fileContent);
+        Files.write(
+                filePath,
+                Main.telegramBot.getFileContent(
+                        getFileResponse.file()
+                )
+        );
 
-        // 7. Foydalanuvchiga xabar yuborish
+        // 4. Foydalanuvchiga yuklanganligi haqida xabar yuborish
         String message = "✅ Rasm muvaffaqiyatli saqlandi!\n" +
                 "📂 Fayl nomi: " + fileName + "\n" +
                 "📁 Saqlangan joy: " + filePath.toAbsolutePath();
 
-        Main.telegramBot.execute(new SendMessage(update.message().chat().id(), message));
+        Main.telegramBot.execute(
+                new SendMessage(
+                        admin.getChatId(),
+                        message
+                )
+        );
     }
 }

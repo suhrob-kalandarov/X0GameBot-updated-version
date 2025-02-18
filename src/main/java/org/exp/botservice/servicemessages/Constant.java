@@ -13,6 +13,7 @@ public interface Constant {
     String LANGUAGE_MSG = "language_msg";
 
     String STATISTICS_MSG = "statistics_msg";
+    String STATISTICS_BTN = "statistics_btn";
 
     String RESULT_MSG = "result_msg";
     String YOU_WON_MSG = "win_msg";
@@ -22,6 +23,7 @@ public interface Constant {
     String BOARD_MSG = "board_msg";
 
     String USER_STATISTICS_MSG = "user_statistics_msg";
+    String SUPPORT_BTN = "support_btn";
 
     String CHOOSE_LANG = "choose_language";
     String LANG_SUCCESS_MSG = "language_success_msg";

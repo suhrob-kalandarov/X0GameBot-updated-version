@@ -5,94 +5,113 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.exp.Main;
 import org.exp.botservice.commands.BotCommand;
 import org.exp.botservice.gamelogic.GameLogic;
 import org.exp.botservice.service.BotButtonService;
-import org.exp.botservice.servicemessages.Constant;
+import org.exp.database.DB;
 import org.exp.entity.tguserentities.State;
 import org.exp.entity.tguserentities.TgUser;
 
 import static org.exp.Main.telegramBot;
 import static org.exp.botservice.servicemessages.Constant.*;
-import static org.exp.botservice.servicemessages.ResourceMessageManager.getString;
+import static org.exp.botservice.servicemessages.ResourceMessageManager.*;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class PlayGameCmd implements BotCommand {
+    private static final Logger logger = LogManager.getLogger(PlayGameCmd.class);
     private final TgUser tgUser;
     private final Update update;
     private final String data;
 
     @Override
     public void process() {
-        getAndSetChosenSymbol();
-        tgUser.initializeBoard();
+        logger.info("O'yin boshlanishi (User: {})", tgUser.getChatId());
+        try {
+            getAndSetChosenSymbol();
+            tgUser.initializeBoard();
+            logger.debug("Doska reset qilindi");
 
-        // Agar foydalanuvchi ⭕ ni tanlagan bo'lsa, bot birinchi yurishi kerak
-        if (tgUser.getPlayerSymbol().equals(O_SIGN)) {
-            int[] botMove = findBestMove(tgUser.getGameBoard());
-            tgUser.getGameBoard()[botMove[0]][botMove[1]] = 2; // Bot yurishi
+            if (tgUser.getPlayerSymbol().equals(O_SIGN)) {
+                logger.debug("Bot birinchi yurish qiladi");
+                int[] botMove = findBestMove(tgUser.getGameBoard());
+                logger.trace("Bot yurishi: [{}, {}]", botMove[0], botMove[1]);
+                tgUser.getGameBoard()[botMove[0]][botMove[1]] = 2;
+            }
+
+            EditMessageText editMessage = new EditMessageText(
+                    tgUser.getChatId(),
+                    tgUser.getMessageId(),
+                    formatGameStartMessage()
+            );
+            editMessage.replyMarkup(BotButtonService.genGameBoard(tgUser.getGameBoard(), tgUser.getPlayerSymbol()));
+            SendResponse response = (SendResponse) telegramBot.execute(editMessage);
+            tgUser.setMessageId(response.message().messageId());
+            tgUser.setState(State.IN_GAME);
+            logger.debug("O'yin doskasi yuborildi");
+        } catch (Exception e) {
+            logger.error("O'yin boshlashda xatolik: {}", e.getMessage(), e);
         }
-
-        // O'yin boshlanish xabarini yuborish
-        EditMessageText editMessage = new EditMessageText(
-                tgUser.getChatId(),
-                tgUser.getMessageId(),
-                formatGameStartMessage()
-        );
-        editMessage.replyMarkup(BotButtonService.genGameBoard(tgUser.getGameBoard(), tgUser.getPlayerSymbol()));
-        SendResponse response = (SendResponse) telegramBot.execute(editMessage);
-        tgUser.setMessageId(response.message().messageId());
-        tgUser.setState(State.IN_GAME);
     }
 
     public void handleMove(int row, int col) {
-        // Katakcha band bo'lsa
-        if (tgUser.getGameBoard()[row][col] != 0) {
-            return;
-        }
+        logger.debug("Foydalanuvchi yurishi: [{}, {}]", row, col);
+        try {
+            if (tgUser.getGameBoard()[row][col] != 0) {
+                logger.warn("Noto'g'ri yurish: [{}, {}]", row, col);
+                return;
+            }
 
-        // Foydalanuvchi harakati
-        tgUser.getGameBoard()[row][col] = 1;
+            tgUser.getGameBoard()[row][col] = 1;
+            logger.trace("Doska yangilandi");
 
-        // Foydalanuvchi yutganligini tekshirish
-        if (checkWin(tgUser.getGameBoard(), 1)) {
-            tgUser.setUserScore(tgUser.getUserScore()+1);
-            sendResult(YOU_WON_MSG);
-            return;
-        }
+            if (checkWin(tgUser.getGameBoard(), 1)) {
+                logger.info("Foydalanuvchi yutdi! (User: {})", tgUser.getChatId());
+                tgUser.setUserScore(tgUser.getUserScore() + 1);
+                DB.updateUserScore(tgUser.getChatId(), tgUser.getUserScore());
+                sendResult(YOU_WON_MSG);
+                return;
+            }
 
-        // Doska to'liqligini tekshirish (foydalanuvchi yurishidan keyin)
-        if (isBoardFull(tgUser.getGameBoard())) {
-            tgUser.setDrawScore(tgUser.getDrawScore()+1);
-            sendResult(DRAW_MSG);
-            return;
-        }
+            if (isBoardFull(tgUser.getGameBoard())) {
+                logger.info("Doska to'la (Durang)");
+                tgUser.setDrawScore(tgUser.getDrawScore() + 1);
+                DB.updateDrawScore(tgUser.getChatId(), tgUser.getDrawScore());
+                sendResult(DRAW_MSG);
+                return;
+            }
 
-        // Bot harakati
             int[] botMove = new GameLogic().findBestMove(tgUser.getGameBoard());
+            logger.debug("Bot yurishi: [{}, {}]", botMove[0], botMove[1]);
             tgUser.getGameBoard()[botMove[0]][botMove[1]] = 2;
 
-        // Bot yutganligini tekshirish
-        if (checkWin(tgUser.getGameBoard(), 2)) {
-            tgUser.setBotScore(tgUser.getBotScore()+1);
-            sendResult(YOU_LOST_MSG);
+            if (checkWin(tgUser.getGameBoard(), 2)) {
+                logger.info("Bot yutdi! (User: {})", tgUser.getChatId());
+                tgUser.setBotScore(tgUser.getBotScore() + 1);
+                sendResult(YOU_LOST_MSG);
+                DB.updateBotScore(tgUser.getChatId(), tgUser.getBotScore());
+                return;
+            }
 
-            return;
+            if (isBoardFull(tgUser.getGameBoard())) {
+                logger.info("Doska to'la (Durang)");
+                tgUser.setDrawScore(tgUser.getDrawScore() + 1);
+                DB.updateDrawScore(tgUser.getChatId(), tgUser.getDrawScore());
+                sendResult(DRAW_MSG);
+                return;
+            }
+            updateGameBoard();
+        } catch (Exception e) {
+            logger.error("Yurishni qayta ishlashda xatolik: {}", e.getMessage(), e);
         }
-
-        // Doska to'liqligini tekshirish (bot yurishidan keyin)
-        if (isBoardFull(tgUser.getGameBoard())) {
-            tgUser.setDrawScore(tgUser.getDrawScore()+1);
-            sendResult(DRAW_MSG);
-            return;
-        }
-        updateGameBoard();
     }
+
+    // ... qolgan metodlar ...
 
     // Doskani yangilash
     private void updateGameBoard() {
@@ -155,13 +174,22 @@ public class PlayGameCmd implements BotCommand {
         Main.telegramBot.execute(editMessage);
 
 
+        String message = String.format(
+                getString(USER_STATISTICS_MSG),
+                tgUser.getUserScore(),
+                tgUser.getDrawScore(),
+                tgUser.getBotScore()
+        );
+
         SendMessage sendMainMessage = new SendMessage(
                 tgUser.getChatId(),
-                getString(Constant.START_MSG)
+                message
         );
-        sendMainMessage.replyMarkup(BotButtonService.genCabinetButtons());
+        sendMainMessage.parseMode(ParseMode.valueOf("HTML"));
+        sendMainMessage.replyMarkup(BotButtonService.genAfterGameCabinetButtons());
         SendResponse sendResponse = telegramBot.execute(sendMainMessage);
         tgUser.setMessageId(sendResponse.message().messageId());
+        DB.updateMessageId(tgUser.getChatId(), tgUser.getMessageId());
         tgUser.setState(State.CABINET);
 
         // Doskani reset qilish
@@ -170,11 +198,12 @@ public class PlayGameCmd implements BotCommand {
 
     @NotNull
     private EditMessageText getEditMessageText(String resultMessage, String boardState) {
-        String message = String.format(getString(USER_STATISTICS_MSG),
+        /*String message = String.format(
+                getString(USER_STATISTICS_MSG),
                 tgUser.getUserScore(),
                 tgUser.getDrawScore(),
                 tgUser.getBotScore()
-        );
+        );*/
 
         return new EditMessageText(
                 tgUser.getChatId(),
@@ -183,8 +212,6 @@ public class PlayGameCmd implements BotCommand {
                         + getString(resultMessage)
                         + "</b>\n\n<b>" + getString(BOARD_MSG) + "</b>"
                         + boardState
-                        + "\n\n"
-                        + message
         );
     }
 
@@ -234,6 +261,7 @@ public class PlayGameCmd implements BotCommand {
             sendMessage.replyMarkup(BotButtonService.genCabinetButtons());
             SendResponse sendResponse = telegramBot.execute(sendMessage);
             tgUser.setMessageId(sendResponse.message().messageId());
+            DB.updateMessageId(tgUser.getChatId(), tgUser.getMessageId());
         }
     }
 }

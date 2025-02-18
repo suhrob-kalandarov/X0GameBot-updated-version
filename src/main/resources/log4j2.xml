@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <RollingFile name="DailyLogFile"
+                     filePattern="logs/game0xx0-%d{yyyy-MM-dd}.log.gz"
+                     append="true"
+                     createOnDemand="true">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DirectWriteRolloverStrategy>
+                <Delete basePath="logs" maxDepth="1">
+                    <IfFileName glob="game0xx0-*.log.gz" />
+                    <IfLastModified age="30d" />
+                </Delete>
+            </DirectWriteRolloverStrategy>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="DailyLogFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

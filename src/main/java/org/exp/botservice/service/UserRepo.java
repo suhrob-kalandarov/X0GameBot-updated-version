@@ -1,12 +1,6 @@
 package org.exp.botservice.service;
 
-import jakarta.persistence.EntityManager;
-import org.exp.database.DB;
-import org.exp.entity.tguserentities.TgUser;
 
-import java.util.List;
-
-import static java.lang.Class.forName;
 
 public class UserRepo {
     public static void main(String[] args) throws ClassNotFoundException {

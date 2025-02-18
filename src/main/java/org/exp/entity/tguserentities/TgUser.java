@@ -5,21 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 
-
-@Entity
-@Table(name = "tg_user")
 public class TgUser {
-    @Id
     private Long chatId;
     private String username;
     private Integer messageId;

@@ -18,6 +18,26 @@ public interface BotButtonService {
                                 .callbackData(PLAY_BTN)
                 )
                 .addRow(
+                        new InlineKeyboardButton(getString(STATISTICS_BTN))
+                                .callbackData(STATISTICS_BTN)
+                )
+                .addRow(
+                        new InlineKeyboardButton(getString(LANGUAGE_MSG))
+                                .callbackData(LANGUAGE_MSG)
+                );
+    }
+
+    static InlineKeyboardMarkup genAfterGameCabinetButtons() {
+        return new InlineKeyboardMarkup()
+                .addRow(
+                        new InlineKeyboardButton(getString(PLAY_BTN))
+                                .callbackData(PLAY_BTN)
+                )
+                .addRow(
+                        new InlineKeyboardButton(getString(SUPPORT_BTN))
+                                .callbackData(SUPPORT_BTN)
+                )
+                .addRow(
                         new InlineKeyboardButton(getString(LANGUAGE_MSG))
                                 .callbackData(LANGUAGE_MSG)
                 );

@@ -34,12 +34,6 @@ public class MsgSenderMainPanel implements BotCommand {
             );
             admin.setMessageId(response.message().messageId());
             admin.setAdminState(AdminState.TEXT_REQUIRED);
-            /*
-            for (TgUser tgUser : DB.TG_USERS_LIST) {
-            SendMessage sendMessage = new SendMessage(tgUser.getChatId(), text);
-            Main.telegramBot.execute(sendMessage);
-            }
-            */
         }
     }
 }
