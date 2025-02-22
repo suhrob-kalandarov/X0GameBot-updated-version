@@ -25,6 +25,19 @@ public interface Constant {
     String USER_STATISTICS_MSG = "user_statistics_msg";
     String SUPPORT_BTN = "support_btn";
 
+
+    String DIFFICULTY_LEVEL_MSG = "👶Qiyinchilik darajasi🥶";
+    String LEVEL_="";
+    String LEVEL_EASY = "👶Oson";
+    String LEVEL_AVERAGE = "😎O'rtacha";
+    String LEVEL_DIFFICULT = "😈Qiyin";
+    String LEVEL_EXTREME = "🥶Ekstremal";
+
+    String CHOOSE_DIFFICULTY_LEVEL = """
+            Hozirgi daraja: %s
+            Qiyinchilik darajasini tanlang:""";
+
+
     String CHOOSE_LANG = "choose_language";
     String LANG_SUCCESS_MSG = "language_success_msg";
     String CHOOSE_SYMBOL_MSG = "choose_symbol_msg";

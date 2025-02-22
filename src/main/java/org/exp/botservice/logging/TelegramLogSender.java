@@ -22,7 +22,8 @@ public class TelegramLogSender {
     public void sendDailyLog() {
         try {
             // Bugungi sana bo‘yicha log fayl nomini olish
-            String logFileName = "logs/game0xx0-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".log";
+            String logFileName = "src/main/resources/logs/game0xx0-" +
+                    LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".log";
             File logFile = new File(logFileName);
 
             // Fayl mavjudligini tekshirish
@@ -54,7 +55,7 @@ public class TelegramLogSender {
 
     private void archiveLogFile(File logFile) {
         try {
-            File archiveDir = new File("logs/archive");
+            File archiveDir = new File("src/main/resources/logs/archive");
             if (!archiveDir.exists()) {
                 archiveDir.mkdirs();
             }

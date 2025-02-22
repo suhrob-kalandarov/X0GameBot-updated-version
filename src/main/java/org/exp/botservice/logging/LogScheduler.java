@@ -9,18 +9,18 @@ public class LogScheduler {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
         // TEST UCHUN: Bugun 00:00 da log yuborish (faqat bir marta)
-        long testDelay = getInitialDelayForHour(0);
+        long testDelay = getInitialDelayForHour(17);
         scheduler.schedule(logSender::sendDailyLog, testDelay, TimeUnit.MINUTES);
 
         // HAQIQIY REJALASHTIRISH: Har kuni 09:00 da log yuborish
-        long initialDelay = getInitialDelayForHour(9);
+        long initialDelay = getInitialDelayForHour(18);
         scheduler.scheduleAtFixedRate(logSender::sendDailyLog, initialDelay, 24, TimeUnit.HOURS);
     }
 
     // Berilgan soatga qancha vaqt qolgani hisoblash
     private static long getInitialDelayForHour(int targetHour) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime targetTime = now.toLocalDate().atTime(targetHour, 0);
+        LocalDateTime targetTime = now.toLocalDate().atTime(targetHour, 50);
 
         if (now.isAfter(targetTime)) {
             // Agar vaqt allaqachon o‘tgan bo‘lsa, ertangi kun uchun hisoblaymiz

@@ -212,6 +212,31 @@ public interface DB {
         return null;
     }
 
+    public static List<TgUser> getAllUsersFromDatabase() {
+        List<TgUser> userList = new ArrayList<>();
+        String query = "SELECT * FROM game0xx0";
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()
+        ) {
+            while (resultSet.next()) {
+                TgUser user = TgUser.builder()
+                        .chatId(resultSet.getLong("chat_id"))
+                        .username(resultSet.getString("username"))
+                        .userScore(resultSet.getInt("user_score"))
+                        .drawScore(resultSet.getInt("draw_score"))
+                        .botScore(resultSet.getInt("bot_score"))
+                        .language(resultSet.getString("language"))
+                        .build();
+                userList.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userList;
+    }
+
 
     static Map<String, Integer> getAllScores(long chatId) {
         String query = "SELECT user_score, draw_score, bot_score FROM game0xx0 WHERE chat_id = ?";

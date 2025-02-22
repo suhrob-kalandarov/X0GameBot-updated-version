@@ -24,6 +24,9 @@ public interface BotButtonService {
                 .addRow(
                         new InlineKeyboardButton(getString(LANGUAGE_MSG))
                                 .callbackData(LANGUAGE_MSG)
+                )
+                .addRow(new InlineKeyboardButton(DIFFICULTY_LEVEL_MSG).callbackData(DIFFICULTY_LEVEL_MSG)
+                        //new InlineKeyboardButton(getDifficultyLevel(tgUser))
                 );
     }
 
@@ -40,6 +43,9 @@ public interface BotButtonService {
                 .addRow(
                         new InlineKeyboardButton(getString(LANGUAGE_MSG))
                                 .callbackData(LANGUAGE_MSG)
+                )
+                .addRow(new InlineKeyboardButton(DIFFICULTY_LEVEL_MSG).callbackData(DIFFICULTY_LEVEL_MSG)
+                        //new InlineKeyboardButton(getDifficultyLevel(tgUser))
                 );
     }
 
@@ -59,6 +65,23 @@ public interface BotButtonService {
             markup.addRow(row);
         }
         return markup;
+    }
+
+    static InlineKeyboardMarkup genDifficultyLevelButtons(){
+        return new InlineKeyboardMarkup()
+                .addRow(
+                        new InlineKeyboardButton(LEVEL_EASY).callbackData("level_easy")
+                )
+                .addRow(
+                        new InlineKeyboardButton(LEVEL_AVERAGE).callbackData("level_average"),
+                        new InlineKeyboardButton(LEVEL_DIFFICULT).callbackData("level_difficult")
+                )
+                .addRow(
+                        new InlineKeyboardButton(LEVEL_EXTREME).callbackData("level_extreme")
+                )
+                .addRow(
+                        new InlineKeyboardButton(BACK_BUTTON_MSG).callbackData("back_to_cabinet")
+                );
     }
 
     static InlineKeyboardMarkup genLanguageButtons() {
