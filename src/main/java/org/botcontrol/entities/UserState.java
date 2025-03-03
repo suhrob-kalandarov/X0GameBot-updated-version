@@ -1,0 +1,17 @@
+package org.botcontrol.entities;
+
+public enum UserState {
+    START,
+    MAIN_MENU,
+    STATISTICS_MENU,
+
+    ADMIN_CABINET,
+    LEVEL_DIFFICULTY_CABINET,
+    CABINET,
+    PLAY_WITH_BOT,
+    PLAY_WITH_FRIEND,
+    BOARD_SIZE_SELECTION,
+    SYMBOL_CHOOSING,
+    IN_GAME,
+    LANG_MENU, INFO_GAME, CHANGE_DIFFICULTY_LEVEL,
+}

@@ -2,7 +2,7 @@
 <Configuration status="WARN">
     <Appenders>
         <RollingFile name="DailyLogFile"
-                     filePattern="src/main/resources/logs/game0xx0-%d{yyyy-MM-dd}.log.gz"
+                     filePattern="src/main/java/org/logfiles/game0xx0-%d{yyyy-MM-dd}.log.gz"
                      append="true"
                      createOnDemand="true">
             <PatternLayout>
@@ -13,7 +13,7 @@
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
             <DirectWriteRolloverStrategy>
-                <Delete basePath="src/main/resources/logs" maxDepth="1">
+                <Delete basePath="src/main/java/org/logfiles" maxDepth="1">
                     <IfFileName glob="game0xx0-*.log.gz" />
                     <IfLastModified age="30d" />
                 </Delete>
