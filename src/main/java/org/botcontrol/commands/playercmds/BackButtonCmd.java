@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import lombok.RequiredArgsConstructor;
 
@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import org.botcontrol.entities.User;
-import org.botcontrol.botcommands.BotCommand;
 
 @RequiredArgsConstructor
 public class BackButtonCmd implements BotCommand {

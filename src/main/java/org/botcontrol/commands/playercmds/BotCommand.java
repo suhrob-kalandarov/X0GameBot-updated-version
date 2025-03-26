@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands;
+package org.botcontrol.commands.playercmds;
 
 public interface BotCommand {
     void process();

@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import lombok.RequiredArgsConstructor;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.botcontrol.Main;
 import org.botcontrol.entities.User;
 import org.botcontrol.entities.UserState;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.botservice.btnservice.BotButtonService;
 
@@ -49,12 +48,12 @@ public class ChangeLanguageCmd implements BotCommand {
             );
 
             user.setMessageId(sendResponse.message().messageId());
-            user.setUserState(UserState.CABINET);
+            //user.setUserState(UserState.CABINET);
             user.setLanguage(languageCode);
 
             DB.updateLanguage(user.getUserId(), languageCode);
             DB.updateMessageId(user.getUserId(), user.getMessageId());
-            DB.updateUserState(user.getMessageId(), user.getUserState().toString());
+            //DB.updateUserState(user.getMessageId(), user.getUserState().toString());
 
             logger.debug("Til muvaffaqiyatli o'zgartirildi");
 

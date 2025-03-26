@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import org.botcontrol.entities.User;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.botservice.btnservice.BotButtonService;
 

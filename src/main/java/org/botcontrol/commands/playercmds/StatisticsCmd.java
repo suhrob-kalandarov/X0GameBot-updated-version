@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.EditMessageText;
@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.btnservice.BotButtonService;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.entities.User;
@@ -44,10 +43,10 @@ public class StatisticsCmd implements BotCommand {
             SendResponse sendResponse = (SendResponse) telegramBot.execute(editMessageText);
 
             user.setMessageId(sendResponse.message().messageId());
-            user.setUserState(UserState.CABINET);
+            //user.setUserState(UserState.CABINET);
 
             DB.updateMessageId(user.getUserId(), user.getMessageId());
-            DB.updateUserState(user.getUserId(), user.getUserState().toString());
+            //DB.updateUserState(user.getUserId(), user.getUserState().toString());
 
             logger.debug("Statistika muvaffaqiyatli yuborildi");
         } catch (Exception e) {

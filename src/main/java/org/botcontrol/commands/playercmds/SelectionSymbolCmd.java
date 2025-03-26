@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.botservice.msgservice.Constant;
 import org.botcontrol.entities.User;
@@ -36,11 +35,11 @@ public class SelectionSymbolCmd implements BotCommand {
                     ).replyMarkup(chooseSymbolButtons())
             );
 
-            user.setUserState(UserState.SYMBOL_CHOOSING);
+           //user.setUserState(UserState.SYMBOL_CHOOSING);
             user.setMessageId(response.message().messageId());
 
             DB.updateMessageId(user.getUserId(), user.getMessageId());
-            DB.updateUserState(user.getUserId(), user.getUserState().toString());
+            //DB.updateUserState(user.getUserId(), user.getUserState().toString());
 
             logger.debug("Belgi tanlash menyusi yuborildi");
 

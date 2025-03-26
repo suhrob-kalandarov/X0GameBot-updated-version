@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import lombok.RequiredArgsConstructor;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -9,7 +9,6 @@ import org.botcontrol.entities.User;
 import org.apache.logging.log4j.Logger;
 import org.botcontrol.entities.UserState;
 import org.apache.logging.log4j.LogManager;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.botservice.btnservice.BotButtonService;
 
@@ -36,32 +35,24 @@ public class ChangeDifficultyLevelCmd implements BotCommand {
         }
 
         String message = String.format(
-                getString(USER_STATISTICS_MSG)
-                        .formatted(
-                                DB.getUserScores(user.getUserId())
-                        )
+                getString(USER_STATISTICS_MSG).formatted(DB.getUserScores(user.getUserId()))
         );
 
         SendResponse response = (SendResponse) telegramBot.execute(
                 new EditMessageText(
                         user.getUserId(), user.getMessageId(),
-                        getString(DIFFICULTY_LEVEL_MSG)
-                                .formatted(
-                                        getString("level_" + user.getDifficultyLevel())
-                                ) + "\n\n" + message + "\n\n@HowdyBots"
-                ).parseMode(
-                        ParseMode.valueOf("HTML")
-
-                ).replyMarkup(
-                        BotButtonService.genAfterGameCabinetButtons()
-                )
+                        getString(DIFFICULTY_LEVEL_MSG).formatted(
+                                getString("level_" + user.getDifficultyLevel())
+                        ) + "\n\n" + message + "\n\n@HowdyBots"
+                ).parseMode(ParseMode.valueOf("HTML")
+                ).replyMarkup(BotButtonService.genAfterGameCabinetButtons())
         );
         user.setMessageId(response.message().messageId());
-        user.setUserState(UserState.CHANGE_DIFFICULTY_LEVEL);
+        //user.setUserState(UserState.CHANGE_DIFFICULTY_LEVEL);
 
         DB.updateDifficultyLevel(user.getUserId(), user.getDifficultyLevel());
         DB.updateMessageId(user.getUserId(), user.getMessageId());
-        DB.updateUserState(user.getUserId(), user.getUserState().toString());
+        //DB.updateUserState(user.getUserId(), user.getUserState().toString());
 
         logger.debug("Kabinet menyusi yuborildi");
     }

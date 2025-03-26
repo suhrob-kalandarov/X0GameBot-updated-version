@@ -1,11 +1,10 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import com.pengrad.telegrambot.request.EditMessageText;
 import lombok.RequiredArgsConstructor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.entities.User;
 
 import static org.botcontrol.Main.telegramBot;
@@ -20,10 +19,7 @@ public class WarningHandlerCmd implements BotCommand {
         logger.warn("Ogohlantirish xabari yuborilmoqda (User: {})", user.getUserId());
         try {
             telegramBot.execute(
-                    new EditMessageText(
-                            user.getUserId(), user.getMessageId(),
-                            "↩"
-                    )
+                    new EditMessageText(user.getUserId(), user.getMessageId(), "↩")
             );
             logger.debug("Ogohlantirish xabari yuborildi");
         } catch (Exception e) {

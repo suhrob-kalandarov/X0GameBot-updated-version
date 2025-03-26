@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -11,13 +11,13 @@ import org.botcontrol.Main;
 
 import org.botcontrol.entities.User;
 import org.botcontrol.entities.UserState;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.entities.DifficultyLevel;
 import org.botcontrol.botservice.gameservice.GameLogic;
 import org.botcontrol.botservice.btnservice.BotButtonService;
 
 import static org.botcontrol.Main.telegramBot;
+import static org.botcontrol.botservice.btnservice.BotButtonService.genGameBoard;
 import static org.botcontrol.botservice.dbservice.DB.*;
 import static org.botcontrol.botservice.msgservice.Constant.*;
 import static org.botcontrol.botservice.msgservice.ResourceMessageManager.getString;
@@ -111,16 +111,9 @@ public class GameCmd implements BotCommand {
     // Update the board
     private void updateGameBoard() {
         EditMessageText editMessage = new EditMessageText(
-                user.getUserId(),
-                user.getMessageId(),
-                formatGameStartMessage()
+                user.getUserId(), user.getMessageId(), formatGameStartMessage()
         );
-        editMessage.replyMarkup(
-                BotButtonService.genGameBoard(
-                        getGameBoard(user.getUserId()),
-                        getUserSign(user.getUserId())
-                )
-        );
+        editMessage.replyMarkup(genGameBoard(getGameBoard(user.getUserId()), getUserSign(user.getUserId())));
         Main.telegramBot.execute(editMessage);
     }
 
@@ -183,22 +176,16 @@ public class GameCmd implements BotCommand {
         // Send main menu
         user.setMessageId(
                 telegramBot.execute(
-                        new SendMessage(
-                                user.getUserId(),
-                                getString(USER_STATISTICS_MSG)
-                                        .formatted(DB.getUserScores(user.getUserId()))
-                        ).parseMode(
-                                ParseMode.valueOf("HTML")
-
-                        ).replyMarkup(
-                                BotButtonService.genAfterGameCabinetButtons()
-                        )
+                        new SendMessage(user.getUserId(), getString(USER_STATISTICS_MSG)
+                                .formatted(DB.getUserScores(user.getUserId()))
+                        ).parseMode(ParseMode.valueOf("HTML")
+                        ).replyMarkup(BotButtonService.genAfterGameCabinetButtons())
                 ).message().messageId()
         );
-        user.setUserState(UserState.CABINET);
+        //user.setUserState(UserState.CABINET);
 
         updateMessageId(user.getUserId(), user.getMessageId());
-        updateUserState(user.getUserId(), user.getUserState().toString());
+        //updateUserState(user.getUserId(), user.getUserState().toString());
 
         // Initialize game board
         user.initializeBoard();

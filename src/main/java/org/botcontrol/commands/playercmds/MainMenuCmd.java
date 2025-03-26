@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.btnservice.BotButtonService;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.botservice.msgservice.Constant;
@@ -35,7 +34,7 @@ public class MainMenuCmd implements BotCommand {
 
             DB.updateMessageId(user.getUserId(), user.getMessageId());
 
-            user.setUserState(UserState.CABINET);
+            //user.setUserState(UserState.CABINET);
 
             logger.debug("Kabinet menyusi yuborildi");
         } catch (Exception e) {

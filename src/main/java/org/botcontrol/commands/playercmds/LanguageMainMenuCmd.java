@@ -1,4 +1,4 @@
-package org.botcontrol.botcommands.botplayer;
+package org.botcontrol.commands.playercmds;
 
 import lombok.RequiredArgsConstructor;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.botcontrol.Main;
 import org.botcontrol.entities.User;
 import org.botcontrol.entities.UserState;
-import org.botcontrol.botcommands.BotCommand;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.botservice.btnservice.BotButtonService;
 
@@ -36,10 +35,10 @@ public class LanguageMainMenuCmd implements BotCommand {
             );
 
             user.setMessageId(sendResponse.message().messageId());
-            user.setUserState(UserState.LANG_MENU);
+            //user.setUserState(UserState.LANG_MENU);
 
             DB.updateMessageId(user.getUserId(), user.getMessageId());
-            DB.updateUserState(user.getUserId(), user.getUserState().toString());
+            //DB.updateUserState(user.getUserId(), user.getUserState().toString());
 
             logger.debug("Til tanlash menyusi yuborildi");
         } catch (Exception e) {
