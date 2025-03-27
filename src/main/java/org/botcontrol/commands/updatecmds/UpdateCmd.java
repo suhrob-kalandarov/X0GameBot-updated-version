@@ -1,12 +1,11 @@
 package org.botcontrol.commands.updatecmds;
 
-import com.pengrad.telegrambot.model.CallbackQuery;
-import com.pengrad.telegrambot.model.ChosenInlineResult;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.*;
 import lombok.RequiredArgsConstructor;
 import org.botcontrol.botservice.dbservice.DB;
 import org.botcontrol.entities.User;
+
+import java.util.Objects;
 
 
 @RequiredArgsConstructor
@@ -15,26 +14,38 @@ public class UpdateCmd implements UpdateCommand {
 
     @Override
     public void handle() {
-        Message message = update.message();
-        CallbackQuery callback = update.callbackQuery();
-        ChosenInlineResult chosenInlineResult = update.chosenInlineResult();
+        try {
+            UpdateCommand command = null;
+            Message message = update.message();
+            CallbackQuery callback = update.callbackQuery();
+            InlineQuery inlineQuery = update.inlineQuery();
+            ChosenInlineResult chosenInlineResult = update.chosenInlineResult();
 
-        User user = DB.getOrCreateUser(update);
+            User user = DB.getOrCreateUser(update);
 
-        if (message != null) {
+            if (message != null) {
 
-            new MessageCmd(update, user).handle();
+                command = new MessageCmd(update, user);
 
-        } else if (callback != null) {
+            } else if (callback != null) {
 
-            new CallbackCmd(update, user).handle();
+                command = new CallbackCmd(update, user);
 
-        } else if (chosenInlineResult != null) {
+            } else if (inlineQuery != null) {
 
-            new InlineResultCmd(update, user).handle();
+                command = new InlineQueryCmd(inlineQuery);
 
-        } else {
-            System.out.println("Unknown update: " + update);
+            } else if (chosenInlineResult != null) {
+
+                command = new InlineResultCmd(update, user);
+
+            } else {
+                System.out.println("Unknown update: " + update);
+            }
+            Objects.requireNonNull(command).handle();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

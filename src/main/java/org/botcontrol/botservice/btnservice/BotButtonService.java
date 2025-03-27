@@ -1,6 +1,9 @@
 package org.botcontrol.botservice.btnservice;
 
 import com.pengrad.telegrambot.model.request.*;
+import com.pengrad.telegrambot.request.EditMessageText;
+import org.botcontrol.Main;
+import org.botcontrol.entities.MultiGame;
 
 import static org.botcontrol.botservice.msgservice.Constant.*;
 import static org.botcontrol.botservice.msgservice.ResourceMessageManager.getString;
@@ -13,8 +16,8 @@ public interface BotButtonService {
                 .addRow(new InlineKeyboardButton(getString(PLAY_WITH_BOT_BTN))
                                 .callbackData(PLAY_WITH_BOT_BTN),
                         new InlineKeyboardButton(getString(PLAY_WITH_FRIEND_BTN))
-                                .callbackData(PLAY_WITH_FRIEND_BTN)
-                                //.switchInlineQuery("")
+                                //.callbackData(PLAY_WITH_FRIEND_BTN)
+                                .switchInlineQuery(" ")
                 )
                 .addRow(new InlineKeyboardButton(getString(DIFFICULTY_LEVEL_BTN))
                         .callbackData(DIFFICULTY_LEVEL_BTN)
@@ -33,8 +36,8 @@ public interface BotButtonService {
                         new InlineKeyboardButton(getString(PLAY_WITH_BOT_BTN))
                                 .callbackData(PLAY_WITH_BOT_BTN),
                         new InlineKeyboardButton(getString(PLAY_WITH_FRIEND_BTN))
-                                .callbackData(PLAY_WITH_FRIEND_BTN)
-                                //.switchInlineQuery("")
+                                //.callbackData(PLAY_WITH_FRIEND_BTN)
+                                .switchInlineQuery(" ")
 
                 )
                 .addRow(new InlineKeyboardButton(getString(DIFFICULTY_LEVEL_BTN))
@@ -104,5 +107,79 @@ public interface BotButtonService {
                 .addRow(
                         new InlineKeyboardButton(getString(BACK_BUTTON_MSG)).callbackData("back_to_cabinet")
                 );
+    }
+
+    static InlineKeyboardMarkup getBoardBtns(int[][] board, int gameId) {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        for (int i = 0; i < board.length; i++) {
+            InlineKeyboardButton[] row = new InlineKeyboardButton[board[i].length];
+            for (int j = 0; j < board[i].length; j++) {
+                String cellText = switch (board[i][j]) {
+                    case 1 -> "❌";
+                    case 2 -> "⭕";
+                    default -> "⬜";
+                };
+                row[j] = new InlineKeyboardButton(cellText)
+                        .callbackData("MOVE_" + gameId + "_" + i + "_" + j);
+            }
+            markup.addRow(row);
+        }
+        return markup;
+    }
+
+
+    static void sendGameBoard(MultiGame game, String inlineMessageId) {
+        if (game.getTurn() == null) {
+            //log("Navbat belgilanmagan: Game ID = " + game.getGameId());
+            return;
+        }
+
+        //String status = "Navbat: " + (game.getTurn().equals(game.getPlayerXId()) ? "❌" : "⭕");
+
+        Long xPlayer = game.getPlayerO().getUserId();
+        Long oPlayer = game.getPlayerX().getUserId();
+
+        String xPlayerFullName = game.getPlayerX().getFullName();
+        String oPlayerFullName = game.getPlayerO().getFullName();
+
+        Long turnId = game.getTurn();
+
+        String status = "❌ " + xPlayerFullName + "%s\n⭕ " + oPlayerFullName + "%s";
+        if (!turnId.equals(xPlayer)) {
+            status = status.formatted("👈", "");
+        } else {
+            status = status.formatted("", "👈");
+        }
+
+        EditMessageText editMessage = new EditMessageText(
+                inlineMessageId,
+                status
+        ).replyMarkup(getBoardBtns(game.getGameBoard(), game.getGameId()))
+                .parseMode(ParseMode.Markdown);
+        Main.telegramBot.execute(editMessage);
+
+        //log("Game board yuborildi: Game ID = " + game.getGameId());
+    }
+
+    static String formatBoard(int[][] board) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                sb.append(switch (board[i][j]) {
+                    case 1 -> "❌";
+                    case 2 -> "⭕";
+                    default -> "⬜";
+                });
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    static InlineKeyboardMarkup endGameBtns() {
+        return new InlineKeyboardMarkup(
+                new InlineKeyboardButton("🔄").switchInlineQueryCurrentChat(" "),
+                new InlineKeyboardButton("🤖").url("https://t.me/" + Main.BOT_USERNAME)
+        );
     }
 }

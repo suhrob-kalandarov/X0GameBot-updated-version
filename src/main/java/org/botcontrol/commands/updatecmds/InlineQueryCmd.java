@@ -1,6 +1,5 @@
 package org.botcontrol.commands.updatecmds;
 
-import com.pengrad.telegrambot.model.ChosenInlineResult;
 import com.pengrad.telegrambot.model.InlineQuery;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.*;
@@ -12,25 +11,19 @@ import org.botcontrol.entities.User;
 import static org.botcontrol.botservice.gameservice.MultiplayerLogic.createNewGame;
 
 @RequiredArgsConstructor
-public class InlineResultCmd implements UpdateCommand {
-    private final Update update;
-    private final User user;
-
-    //private final ChosenInlineResult chosenInlineResult = update.chosenInlineResult();
+public class InlineQueryCmd implements UpdateCommand {
+    private final InlineQuery inlineQuery;
+    //private final User user;
 
     @Override
     public void handle() {
-        ChosenInlineResult chosenInlineResult = update.chosenInlineResult();
-
-        System.out.println("ChosenInlineResult: {" + chosenInlineResult + "}");
-
-        InlineQuery inlineQuery = update.inlineQuery();
-        // Yangi o'yin yaratamiz va gameId ni olamiz
-        Long creatorId = inlineQuery.from().id();
-        int gameId = createNewGame(creatorId);
-
         try {
-            // Foydalanuvchi join bo'lishi uchun ikki xil tugma
+
+            Long creatorId = inlineQuery.from().id();
+
+            int gameId = createNewGame(creatorId);
+
+
             // Inline natijada bitta yangi o'yin yaratiladi:
             InlineKeyboardMarkup joinMarkup = new InlineKeyboardMarkup(
                     new InlineKeyboardButton("Join as ❌").callbackData("SELECT_X_" + gameId)
@@ -39,12 +32,13 @@ public class InlineResultCmd implements UpdateCommand {
 
             // Inline natija: oddiy maqola ko‘rinishida tugmalar bilan
             InlineQueryResult[] results = new InlineQueryResult[]{
-                    new InlineQueryResultArticle("join_game", "Start G", "Please, join game!")
+                    new InlineQueryResultArticle("join_game", "Start Game", "Please, join game!")
                             .inputMessageContent(new InputTextMessageContent("Opponent is waiting..."))
                             .replyMarkup(joinMarkup)
             };
 
             Main.telegramBot.execute(new AnswerInlineQuery(inlineQuery.id(), results));
+
         } catch (Exception e) {
             e.printStackTrace();
         }

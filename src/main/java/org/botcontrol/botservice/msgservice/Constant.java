@@ -56,6 +56,11 @@ public interface Constant {
     String LANG = "lang_";
     String CHOSEN_SYMBOL = "CHOOSE_";
 
+    // multi keys
+    String MOVE = "MOVE_";
+    String SELECT_X = "SELECT_X_";
+    String SELECT_O = "SELECT_O_";
+
     String ADMIN = "ADMIN MENU";
     String GAME = "GAME MENU";
     String DEF_LANG_EN = "en";

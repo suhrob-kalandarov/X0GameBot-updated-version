@@ -16,11 +16,12 @@ public class CallbackCmd implements UpdateCommand {
     private final User user;
 
     private BotCommand command;
-    private final CallbackQuery callbackQuery = update.callbackQuery();
+    //private final CallbackQuery callbackQuery = update.callbackQuery();
     private static final Logger logger = LogManager.getLogger(CallbackCmd.class);
 
     @Override
     public void handle() {
+        CallbackQuery callbackQuery = update.callbackQuery();
 
         logger.debug("CallbackQuery data: {}", callbackQuery.data());
 
@@ -29,15 +30,14 @@ public class CallbackCmd implements UpdateCommand {
         if (data.startsWith(CELL)) {
             command = new InGame(user, data);
 
+        } else if (data.startsWith(MOVE) || data.startsWith(SELECT_X) || data.startsWith(SELECT_O)) {
+            command = new InviteFriendCmd(update);
+
         } else if (data.startsWith(LANG)) {
             command = new ChangeLanguageCmd(user, data);
 
         } else if (data.equals(PLAY_WITH_BOT_BTN)) {
             command = new SelectionSymbolCmd(user);
-
-        } else if (data.equals(PLAY_WITH_FRIEND_BTN)) {
-            //command = new InviteFriendCmd(user);
-
 
         } else if (data.startsWith(CHOSEN_SYMBOL)) {
             command = new PlayGameCmd(user, data);

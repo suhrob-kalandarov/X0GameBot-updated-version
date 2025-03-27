@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.UpdatesListener;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import org.botcontrol.botservice.dbservice.ConfigManager;
 import org.botcontrol.commands.updatecmds.UpdateCmd;
 import org.botcontrol.botservice.logservice.LogScheduler;
 
@@ -14,12 +15,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 public class Main {
+    public static final String BOT_USERNAME = "GameOXXO_bot";
     private static final Logger logger = LogManager.getLogger(Main.class);
-    public static TelegramBot telegramBot = new TelegramBot("7621897753:AAGP9X7DILLUZtbHtluc_wmFaqPe9Z2Wvsc");
-    public static String chatId = "@LOGS_PUBLIC_TELEGRAM_CHANNEL";
+    public static TelegramBot telegramBot = new TelegramBot("7958534479:AAHJDLus8pnVZ42w-rTNDAxyCjpd9wE-QQw"); // 7621897753:AAGP9X7DILLUZtbHtluc_wmFaqPe9Z2Wvsc
+    public static String chatId = "@GAME_OXXO";
     public static ExecutorService executorService = Executors.newFixedThreadPool(50);
 
+    static {
+        ConfigManager.worker();
+    }
+
     public static void main(String[] args) {
+
         LogScheduler.logSender(chatId, telegramBot.getToken());
 
         System.out.println("✅ Log jo‘natish jadvali ishga tushdi!");

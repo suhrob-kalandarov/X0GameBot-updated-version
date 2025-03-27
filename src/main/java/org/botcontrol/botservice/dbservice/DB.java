@@ -3,13 +3,53 @@ package org.botcontrol.botservice.dbservice;
 import com.pengrad.telegrambot.model.Update;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.botcontrol.entities.MultiGame;
+import org.botcontrol.entities.MultiplayerUser;
 import org.botcontrol.entities.User;
 import org.botcontrol.entities.UserState;
 
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
 
 public interface DB {
+
+    List<MultiplayerUser> users = new ArrayList<>();
+    Map<Integer, MultiGame> games = new HashMap<>();
+
+
+    static void log(String message) {
+        System.out.println("[LOG] " + new Date() + " - " + message);
+    }
+
+    static void addUser(Long userId, String firstName, String lastName) {
+        MultiplayerUser user = MultiplayerUser.builder()
+                .userId(userId)
+                .fullName(setFullName(firstName, lastName))
+                .build();
+        users.add(user);
+        log("Yangi foydalanuvchi qo'shildi: " + user);
+    }
+
+    static String setFullName(String firstName, String lastName) {
+        AtomicReference<StringBuilder> fullNameBuilder = new AtomicReference<>(new StringBuilder());
+
+        // Ism va familiyani qo'shish
+        if (firstName != null) {
+            fullNameBuilder.get().append(firstName);
+        }
+        if (lastName != null) {
+            if (!fullNameBuilder.get().isEmpty()) {
+                fullNameBuilder.get().append(" ");
+            }
+            fullNameBuilder.get().append(lastName);
+        }
+        return fullNameBuilder.toString();
+    }
+
+
+
 
     Logger logger = LogManager.getLogger(DB.class);
     
@@ -19,12 +59,24 @@ public interface DB {
 
         if (update.callbackQuery() != null) {
             user = getUserFromDatabase(update.callbackQuery().from().id());
-            Objects.requireNonNull(user).setGameBoard(getGameBoard(user.getUserId()));
+            if (user != null) {
+                user.setGameBoard(getGameBoard(user.getUserId()));
+            }
             return user;
         }
 
+        if (update.inlineQuery() != null) {
+            System.out.println("Inline Query detected: " + update.inlineQuery());
+            return null; // Inline query uchun user yaratish shart emas
+        }
+
+        if (update.message() == null || update.message().from() == null) {
+            System.out.println("Xatolik: update.message() yoki from() null!");
+            return null;
+        }
+
         Long userId = update.message().from().id();
-        
+
         user = getUserFromDatabase(userId);
         if (user != null) {
             if (!isUserExists("games", userId)) {
@@ -52,7 +104,8 @@ public interface DB {
 
         return user;
     }
-    
+
+
 
     static String getUserFullName(Update update) {
         String firstName = update.message().chat().firstName();

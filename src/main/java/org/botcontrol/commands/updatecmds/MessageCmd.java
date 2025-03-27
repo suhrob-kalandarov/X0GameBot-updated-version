@@ -14,6 +14,8 @@ import org.botcontrol.entities.User;
 import java.util.Locale;
 
 import static org.botcontrol.Main.*;
+import static org.botcontrol.botservice.dbservice.DB.addUser;
+import static org.botcontrol.botservice.dbservice.DB.setFullName;
 import static org.botcontrol.botservice.msgservice.Constant.*;
 import static org.botcontrol.botservice.msgservice.ResourceMessageManager.getString;
 
@@ -23,11 +25,13 @@ public class MessageCmd implements UpdateCommand {
     private final User user;
 
     private static final Logger logger = LogManager.getLogger(MessageCmd.class);
-    private final Message message = update.message();
+    //private final Message message = update.message();
     private BotCommand command;
 
     @Override
     public void handle() {
+        Message message = update.message();
+
         logger.debug("Xabar user: {}", user);
         String text = message.text();
 
@@ -40,6 +44,16 @@ public class MessageCmd implements UpdateCommand {
                 if (user.getMessageId() != null) {
                     new WarningHandlerCmd(user).process();
                 }
+
+                Long userId = message.from().id();
+                String firstName = message.from().firstName();
+                String lastName = message.from().lastName();
+
+                User.builder()
+                        .userId(userId)
+                        .fullName(setFullName(firstName, lastName))
+                        .build();
+                addUser(userId, firstName, lastName);
 
                 if (ResourceMessageManager.bundle == null) {
                     logger.error("ResourceBundle yuklanmagan! Qayta yuklashga harakat qilamiz.");
